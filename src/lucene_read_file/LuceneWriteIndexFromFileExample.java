@@ -117,10 +117,10 @@ public class LuceneWriteIndexFromFileExample
     		for(int i=4;i<content_arr.length;i++){
     			body+=content_arr[i];
     		}
-    		date=date.substring(0,date.length()-1);
+ //   		date=date.substring(0,date.length()-1);
 //    		System.out.println("$"+title+"$");
 //    		System.out.println("$"+publication+"$");
-//    		System.out.println("$"+date+"$");
+    		System.out.println("$"+date+"$");
 //    		System.out.println("$"+body+"$");
     		
              //System.out.print("as"+date+"as");
