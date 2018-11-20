@@ -33,7 +33,7 @@ public class LuceneReadIndexFromFileExample
         IndexSearcher searcher = createSearcher();
          
         //Search indexed contents using search term
-        String queryString= "Cyclone 19-11-2018 2018/11/19 Something";
+        String queryString= "Fret 31-12-2016 WASHINGTON";
         ArrayList<String> extractedDates=getDates(queryString);
         ArrayList<String> processedDates=processDates(extractedDates);
         ArrayList<TopDocs> foundDateDocs=new ArrayList<TopDocs>();
@@ -127,12 +127,16 @@ public class LuceneReadIndexFromFileExample
     
     private static String convertDate(String date){
     	String returnDate=date;
-    	if(date.charAt(2)=='-'){
-    		String newDate[]=date.split("-");
-    		returnDate=newDate[2]+"/"+newDate[1]+"/"+newDate[0];
+    	if(date.charAt(2)=='/'){
+    		String newDate[]=date.split("/");
+    		returnDate=newDate[2]+"-"+newDate[1]+"-"+newDate[0];
     	}
-    	else if(date.charAt(4)=='-'){
-    		returnDate=date.replace('-', '/');
+    	else if(date.charAt(2)=='-'){
+    		String newDate[]=date.split("-");
+    		returnDate=newDate[2]+"-"+newDate[1]+"-"+newDate[0];
+    	}
+    	else if(date.charAt(4)=='/'){
+    		returnDate=date.replace('/', '-');
     	}
     	return returnDate;
     }

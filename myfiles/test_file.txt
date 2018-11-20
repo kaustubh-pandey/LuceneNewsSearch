@@ -1,3 +1,0 @@
-date:2018/11/19
-title:Cyclone arrival
-body: This text isn't in the previous one
