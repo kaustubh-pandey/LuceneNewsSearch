@@ -112,7 +112,7 @@ public class LuceneWriteIndexFromFileExample
     		}
     		String date=content_arr[0].split(":",0)[1];
     		String title=content_arr[1].split(":",0)[1];
-    		String body=title+" "+content_arr[2].split(":",0)[1];
+    		String body=content_arr[2].split(":",0)[1];
     		for(int i=3;i<content_arr.length;i++){
     			body+=content_arr[i];
     		}
@@ -123,7 +123,7 @@ public class LuceneWriteIndexFromFileExample
 //            doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
     
             doc.add(new StringField("date", new String(date), Store.YES)); 
-            //doc.add(new TextField("title", new String(title), Store.YES));
+            doc.add(new TextField("title", new String(title), Store.YES));
             doc.add(new TextField("body", new String(body), Store.YES)); 
             //Updates a document by first deleting the document(s)
             //containing <code>term</code> and then adding the new
