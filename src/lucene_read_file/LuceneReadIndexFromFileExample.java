@@ -33,7 +33,7 @@ public class LuceneReadIndexFromFileExample
         IndexSearcher searcher = createSearcher();
          
         //Search indexed contents using search term
-        String queryString= "Cyclone 19-11-2018 2018/11/19";
+        String queryString= "Cyclone 19-11-2018 2018/11/19 Something";
         ArrayList<String> extractedDates=getDates(queryString);
         ArrayList<String> processedDates=processDates(extractedDates);
         ArrayList<TopDocs> foundDateDocs=new ArrayList<TopDocs>();
@@ -53,7 +53,8 @@ public class LuceneReadIndexFromFileExample
         }
         System.out.println("-----------------");
         //TopDocs foundDocs = searchInDate("2018/11/19", searcher);
-        TopDocs foundDocs2= searchInBody("Cyclone",searcher);
+        TopDocs foundDocs2= searchInBody(queryString,searcher);
+        TopDocs foundDocs3=searchInTitle(queryString,searcher);
         ArrayList<Integer> arr=new ArrayList<Integer>();
         //Merging to be done
         //System.out.println("Date Match:");
@@ -64,6 +65,10 @@ public class LuceneReadIndexFromFileExample
         System.out.println("Body Match:");
         for(int i=0;i<foundDocs2.scoreDocs.length;i++){
         	System.out.print(foundDocs2.scoreDocs[i].doc+" ");
+        }
+        System.out.println();
+        for(int i=0;i<foundDocs3.scoreDocs.length;i++){
+        	System.out.print(foundDocs3.scoreDocs[i].doc+" ");
         }
         System.out.println();
 //        for(int i=0;i<foundDocs.scoreDocs.length;i++){
@@ -79,8 +84,14 @@ public class LuceneReadIndexFromFileExample
         	System.out.println(arr.get(k));
         }
         //Total found documents
-        //System.out.println("Total Results Date matches :: " + foundDocs.totalHits);
+        long r=0;
+        for(int i=0;i<foundDateDocs.size();i++){
+        		r=foundDateDocs.get(i).totalHits;
+        		System.out.println("Total Results Date matches :: " +r);
+        }
+        
         System.out.println("Total Results Body matches:: " + foundDocs2.totalHits);
+        System.out.println("Total Results Title matches:: " + foundDocs3.totalHits);
          
         //Let's print out the path of files which have searched term
 //        for (ScoreDoc sd : foundDocs.scoreDocs)
@@ -147,6 +158,17 @@ public class LuceneReadIndexFromFileExample
         return hits;
     }
     
+    private static TopDocs searchInTitle(String textToFind, IndexSearcher searcher) throws Exception
+    {
+        //Create search query
+        QueryParser qp = new QueryParser("title", new StandardAnalyzer());
+        Query query = qp.parse(textToFind);
+         
+        //search the index
+        TopDocs hits = searcher.search(query, 10);
+        System.out.println(hits.scoreDocs[0].doc);
+        return hits;
+    }
     private static TopDocs searchInBody(String textToFind, IndexSearcher searcher) throws Exception
     {
         //Create search query
@@ -155,7 +177,7 @@ public class LuceneReadIndexFromFileExample
          
         //search the index
         TopDocs hits = searcher.search(query, 10);
-        System.out.println(hits.scoreDocs[0].doc);
+        //System.out.println(hits.scoreDocs[0].doc);
         return hits;
     }
  
