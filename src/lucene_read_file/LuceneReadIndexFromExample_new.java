@@ -21,8 +21,24 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.search.PhraseQuery;
- 
-public class LuceneReadIndexFromFileExample
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.BlendedTermQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.PerFieldSimilarityWrapper;
+import org.apache.lucene.search.similarities.Similarity;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
+
+import java.io.IOException; 
+
+public class LuceneReadIndexFromExample_new
 {
     //directory contains the lucene indexes
     private static final String INDEX_DIR = "indexedFiles";
@@ -33,78 +49,101 @@ public class LuceneReadIndexFromFileExample
         IndexSearcher searcher = createSearcher();
          
         //Search indexed contents using search term
-        String queryString= "Winter 2016-12-31 WASHINGTON";
+        String queryString= "Fret 31-12-2016 WASHINGTON";
         ArrayList<String> extractedDates=getDates(queryString);
         ArrayList<String> processedDates=processDates(extractedDates);
         ArrayList<TopDocs> foundDateDocs=new ArrayList<TopDocs>();
-        for(int i=0;i<processedDates.size();i++){
-        	System.out.println("Date:"+processedDates.get(i)+"::");
-        	TopDocs foundDocs = searchInDate(processedDates.get(i).toString(), searcher);
-        	foundDateDocs.add(foundDocs);
-        }
-        //System.out.println(foundDateDocs.size());
-        for(int i=0;i<foundDateDocs.size();i++){
-        	
-        	TopDocs foundDocs=foundDateDocs.get(i);
-        	//System.out.println(foundDocs.scoreDocs.length);
-        	for(int j=0;j<foundDocs.scoreDocs.length;j++){
-            	System.out.print(foundDocs.scoreDocs[j].doc+" ");
-            }
-        }
-        System.out.println("-----------------");
-        //TopDocs foundDocs = searchInDate("2018/11/19", searcher);
-        TopDocs foundDocs2= searchInBody(queryString,searcher);
-        TopDocs foundDocs3=searchInTitle(queryString,searcher);
-        ArrayList<Integer> arr=new ArrayList<Integer>();
-        //Merging to be done
-        //System.out.println("Date Match:");
-//        for(int i=0;i<foundDocs.scoreDocs.length;i++){
-//        	System.out.print(foundDocs.scoreDocs[i].doc+" ");
+//        for(int i=0;i<processedDates.size();i++){
+//        	System.out.println("Date:"+processedDates.get(i)+"::");
+//        	TopDocs foundDocs = searchInDate(processedDates.get(i).toString(), searcher);
+//        	foundDateDocs.add(foundDocs);
 //        }
-        System.out.println();
-        System.out.println("Body Match:");
-        for(int i=0;i<foundDocs2.scoreDocs.length;i++){
-        	System.out.print(foundDocs2.scoreDocs[i].doc+" ");
-        }
-        System.out.println();
-        for(int i=0;i<foundDocs3.scoreDocs.length;i++){
-        	System.out.print(foundDocs3.scoreDocs[i].doc+" ");
-        }
-        System.out.println();
-//        for(int i=0;i<foundDocs.scoreDocs.length;i++){
-//        	for(int j=0;j<foundDocs2.scoreDocs.length;j++){
-//        		if(foundDocs.scoreDocs[i].doc==foundDocs2.scoreDocs[j].doc){
-//        			arr.add(foundDocs.scoreDocs[i].doc);
-//        		}
-//        	}
+//        //System.out.println(foundDateDocs.size());
+//        for(int i=0;i<foundDateDocs.size();i++){
 //        	
+//        	TopDocs foundDocs=foundDateDocs.get(i);
+//        	//System.out.println(foundDocs.scoreDocs.length);
+//        	for(int j=0;j<foundDocs.scoreDocs.length;j++){
+//            	System.out.print(foundDocs.scoreDocs[j].doc+" ");
+//            }
 //        }
-        System.out.println("Common Docs :: ");
-        for(int k=0;k<arr.size();k++){
-        	System.out.println(arr.get(k));
+        System.out.println("-----------------");
+//        BlendedTermQuery bm25fQuery = new BlendedTermQuery.Builder()
+//                .add(new Term("title", "moby"), 2.0f)
+//                .add(new Term("description", "moby"), 4.0f)
+//                .setRewriteMethod(BlendedTermQuery.BOOLEAN_REWRITE)
+//                .build();
+        BlendedTermQuery bm25fQuery = new BlendedTermQuery.Builder()
+                .add(new Term("date", "2016-12-31"))
+                .add(new Term("body", "Trump"))
+                .add(new Term("title", "Winter"))
+                .setRewriteMethod(BlendedTermQuery.BOOLEAN_REWRITE)
+                .build();
+        System.out.println(bm25fQuery);
+        TopDocs docs = searcher.search(bm25fQuery, 10);
+        ScoreDoc[] hits = docs.scoreDocs;
+
+        System.out.println("Found " + hits.length + " hits.");
+        for(int i=0;i<hits.length;++i) {
+            int docId = hits[i].doc;
+            Document d = searcher.doc(docId);
+            System.out.println((i + 1) + ". " + d.get("isbn") + "\t" + d.get("title"));
         }
-        //Total found documents
-        long r=0;
-        for(int i=0;i<foundDateDocs.size();i++){
-        		r=foundDateDocs.get(i).totalHits;
-        		System.out.println("Total Results Date matches :: " +r);
-        }
+    }
+
         
-        System.out.println("Total Results Body matches:: " + foundDocs2.totalHits);
-        System.out.println("Total Results Title matches:: " + foundDocs3.totalHits);
-         
-        //Let's print out the path of files which have searched term
-//        for (ScoreDoc sd : foundDocs.scoreDocs)
+        //TopDocs foundDocs = searchInDate("2018/11/19", searcher);
+//        TopDocs foundDocs2= searchInBody(queryString,searcher);
+//        TopDocs foundDocs3=searchInTitle(queryString,searcher);
+//        ArrayList<Integer> arr=new ArrayList<Integer>();
+//        //Merging to be done
+//        //System.out.println("Date Match:");
+////        for(int i=0;i<foundDocs.scoreDocs.length;i++){
+////        	System.out.print(foundDocs.scoreDocs[i].doc+" ");
+////        }
+//        System.out.println();
+//        System.out.println("Body Match:");
+//        for(int i=0;i<foundDocs2.scoreDocs.length;i++){
+//        	System.out.print(foundDocs2.scoreDocs[i].doc+" ");
+//        }
+//        System.out.println();
+//        for(int i=0;i<foundDocs3.scoreDocs.length;i++){
+//        	System.out.print(foundDocs3.scoreDocs[i].doc+" ");
+//        }
+//        System.out.println();
+////        for(int i=0;i<foundDocs.scoreDocs.length;i++){
+////        	for(int j=0;j<foundDocs2.scoreDocs.length;j++){
+////        		if(foundDocs.scoreDocs[i].doc==foundDocs2.scoreDocs[j].doc){
+////        			arr.add(foundDocs.scoreDocs[i].doc);
+////        		}
+////        	}
+////        	
+////        }
+//        System.out.println("Common Docs :: ");
+//        for(int k=0;k<arr.size();k++){
+//        	System.out.println(arr.get(k));
+//        }
+//        //Total found documents
+//        long r=0;
+//        for(int i=0;i<foundDateDocs.size();i++){
+//        		r=foundDateDocs.get(i).totalHits;
+//        		System.out.println("Total Results Date matches :: " +r);
+//        }
+//        
+//        System.out.println("Total Results Body matches:: " + foundDocs2.totalHits);
+//        System.out.println("Total Results Title matches:: " + foundDocs3.totalHits);
+//         
+//        //Let's print out the path of files which have searched term
+////        for (ScoreDoc sd : foundDocs.scoreDocs)
+////        {
+////            Document d = searcher.doc(sd.doc);
+////            System.out.println("Path : "+ d.get("path") +"Date: "+d.get("date")+ ", Score : " + sd.score);
+////        }
+//        for (ScoreDoc sd : foundDocs2.scoreDocs)
 //        {
 //            Document d = searcher.doc(sd.doc);
 //            System.out.println("Path : "+ d.get("path") +"Date: "+d.get("date")+ ", Score : " + sd.score);
 //        }
-        for (ScoreDoc sd : foundDocs2.scoreDocs)
-        {
-            Document d = searcher.doc(sd.doc);
-            System.out.println("Path : "+ d.get("path") +"Date: "+d.get("date")+ ", Score : " + sd.score);
-        }
-    }
      
     
 //    public Document getDocument(ScoreDoc scoreDoc) 
@@ -180,8 +219,6 @@ public class LuceneReadIndexFromFileExample
         Query query = qp.parse(textToFind);
          
         //search the index
-        System.out.println("body");
-        System.out.print(query);
         TopDocs hits = searcher.search(query, 10);
         //System.out.println(hits.scoreDocs[0].doc);
         return hits;
