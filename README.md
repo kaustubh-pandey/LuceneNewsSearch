@@ -1,9 +1,13 @@
 # LuceneNewsSearch - A Search Engine that uses BM25F to search and rank News Articles
 ## About
+This project was a part of Information Retrieval Course
  See IR_Presentation.pdf and IR_Report.pdf for more info
+## Ranking Algorithm
+BM25F, a variant of BM25, was used for ranking search results which is one of the state-of-the-art method used for ranking structured documents
 ## Requirements:
 1. Lucene 6.2.0
-2. Eclipse or netbeans 
+2. Eclipse or netbeans
+(Note: Create  a folder "lucene" in C: drive of windows and put your entire lucene-6.2.0 folder inside this to avoid any build path complications)
 
 --------------------------------------------------------------------
 ## How To Run:
