@@ -52,19 +52,19 @@ public class new_index_writer
 //                return new BM25FSimilarity(/*k1*/1.4f, /*b*/0.9f);
 //            }
         	if (name.equals("body")) {
-                return new BM25FSimilarity(/*k1*/1.2f, /*b*/0.8f);
+                return new BM25FSimilarity(/*k1*/0.6f, /*b*/0.75f);
             }
         	else if (name.equals("title")) {
-                return new BM25FSimilarity(/*k1*/1.2f, /*b*/0.8f);
+                return new BM25FSimilarity(/*k1*/0.6f, /*b*/0.75f);
             }
         	else if (name.equals("date")) {
-                return new BM25FSimilarity(/*k1*/1.4f, /*b*/0.9f);
+                return new BM25FSimilarity(/*k1*/1.4f, /*b*/0.8f);
             }
             return new BM25FSimilarity();
         }
     };
     
-    public static void main(String[] args)
+    public static void smain()
     {
         //Input folder
         String docsPath = "myfiles";
@@ -86,7 +86,7 @@ public class new_index_writer
             //IndexWriter Configuration
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setSimilarity(perFieldSimilarities);
-            iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+//            iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
              
             //IndexWriter writes new index files to the directory
             IndexWriter writer = new IndexWriter(dir, iwc);

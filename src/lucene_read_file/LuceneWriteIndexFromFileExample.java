@@ -1,5 +1,6 @@
 package lucene_read_file;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileVisitResult;
@@ -14,7 +15,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.Field.*;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -101,36 +101,11 @@ public class LuceneWriteIndexFromFileExample
         {
             //Create lucene Document
             Document doc = new Document();
-            
-            //String file_name =new String("E:\\workspace\\lucene_read_file\\myfiles\\test_file.txt");
-    		//String content=new String(Files.readAllBytes(Paths.get(file)));
-            String content=new String(Files.readAllBytes(file));
-    		String content_arr[]=content.split("\n",0);
-    		//System.out.println(content);
-//    		for(int i=0;i<content_arr.length;i++){
-//    			System.out.println(content_arr[i]);
-//    		}
-    		String title=content_arr[0];
-    		String publication=content_arr[1];
-    		String date=content_arr[2];
-    		String body=content_arr[3];
-    		for(int i=4;i<content_arr.length;i++){
-    			body+=content_arr[i];
-    		}
- //   		date=date.substring(0,date.length()-1);
-//    		System.out.println("$"+title+"$");
-//    		System.out.println("$"+publication+"$");
-    		System.out.println("$"+date+"$");
-//    		System.out.println("$"+body+"$");
-    		
-             //System.out.print("as"+date+"as");
+             
             doc.add(new StringField("path", file.toString(), Field.Store.YES));
             doc.add(new LongPoint("modified", lastModified));
-//            doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
-    
-            doc.add(new StringField("date", new String(date), Store.YES)); 
-            doc.add(new TextField("title", new String(title), Store.YES));
-            doc.add(new TextField("body", new String(body), Store.YES)); 
+            doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
+             
             //Updates a document by first deleting the document(s)
             //containing <code>term</code> and then adding the new
             //document.  The delete and then add are atomic as seen
